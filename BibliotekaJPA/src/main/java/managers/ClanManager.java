@@ -112,5 +112,26 @@ public class ClanManager {
 			return false;
 		}
 	}
+	
+	public boolean obrisiClana(int clanskiBr) {
+		EntityManager em=JPAUtil.getEntityManager();
+		
+		try {
+			em.getTransaction().begin();
+			Clan c=em.find(Clan.class, clanskiBr);
+			
+			//prvo brisem zaduzenja
+			List<Zaduzenje> zaduzenja=c.getZaduzenjes();
+			for(Zaduzenje z: zaduzenja)
+				em.remove(z);
+			em.remove(c);
+			
+			em.getTransaction().commit();
+			return true;
+		}catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 }
