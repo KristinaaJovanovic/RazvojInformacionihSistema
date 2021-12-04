@@ -1,11 +1,13 @@
 package managers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
 import model.Knjiga;
+import model.Primerak;
 
 public class KnjigaManager {
 	
@@ -50,6 +52,31 @@ public class KnjigaManager {
 		return knjige;
 		
 	}
+	/**Za odgovarajuci id knjige, pronalazi knjigu u bazi*/
+	public List<Integer> dodajPrimerke(int idKnjige, int brPrimeraka){
+		ArrayList<Integer> invBrojevi=new ArrayList<Integer>();
+		
+		try {
+			EntityManager em=JPAUtil.getEntityManager();
+			Knjiga k=em.find(Knjiga.class, idKnjige);
+			if(k!=null) {
+				em.getTransaction().begin();
+				for(int i=0;i<brPrimeraka;i++) {
+					Primerak p=new Primerak();
+					p.setKnjiga(k);
+					em.persist(p);
+					invBrojevi.add(p.getInvBroj());
+				}
+				em.getTransaction().commit();
+			}
+			return invBrojevi;
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	
 	public static void main(String[] args) {
 		KnjigaManager km=new KnjigaManager();

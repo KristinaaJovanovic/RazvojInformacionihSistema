@@ -66,15 +66,31 @@ public class UnosKnjigeServlet extends HttpServlet {
 		Knjiga k=km.unesiKnjigu(naslov, autor, godinaIzdanja, izdavac);
 		
 		//obavestenje da li sam uspesno unela
-		ServletConfig c=this.getServletConfig();
-		String path=null;
+		//ServletConfig c=this.getServletConfig();
+		//String path=null;
+		//if(k!=null)
+			//path=c.getInitParameter("addresSuccess");
+		//else
+			//path=c.getInitParameter("addressError");
+		
+		/**dodajemo poruku**/
+		String poruka=null;
 		if(k!=null)
-			path=c.getInitParameter("addresSuccess");
+			System.out.println("Knjiga je uspesno sacuvana. ID knjige je: "+k.getIdKnjige());
 		else
-			path=c.getInitParameter("addressError");
-	
-		RequestDispatcher rd=request.getServletContext().getRequestDispatcher(path);
+			System.out.println("Doslo je do greske!");
+		
+		/**ova poruka moze da se upakuje i posalje na stranicu na koju vrsim redirekciju
+		 * i tamo prikazem tu istu poruku**/
+		request.setAttribute("porukaKnjiga", poruka);
+		request.getSession().setAttribute("knjiga", k);
+		
+		/**Zapravo, sada zelim da prosledjujem kontrolu na jsp stranicu**/
+		RequestDispatcher rd=request.getServletContext().getRequestDispatcher("/DodavanjePrimeraka.jsp");
 		rd.forward(request, response);
+		
+		
+		
 	}
 
 }
