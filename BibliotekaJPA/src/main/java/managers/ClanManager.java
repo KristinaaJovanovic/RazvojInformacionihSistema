@@ -7,6 +7,8 @@ import javax.persistence.EntityManager;
 
 import model.Clan;
 import model.Kategorija;
+import model.Primerak;
+import model.Zaduzenje;
 
 public class ClanManager {
 	
@@ -45,6 +47,70 @@ public class ClanManager {
 		EntityManager em=JPAUtil.getEntityManager();
 		List<Kategorija> kategorije=(List<Kategorija>) em.createQuery("select k from Kategorija k").getResultList();
 		return kategorije;
+	}
+	
+	//cuvanje zaduzenja
+	public Zaduzenje cuvanjeZaduzenja(int clanskiBroj, int invBroj) {
+		
+		try {
+			EntityManager em=JPAUtil.getEntityManager();
+			em.getTransaction().begin();
+
+			
+			/**Dobavicemo Clana na osnovu clanskog broja i Primerak na osnovu invntarnog broja**/
+			Clan c=em.find(Clan.class, clanskiBroj);
+			Primerak p=em.find(Primerak.class, invBroj);
+			
+			Zaduzenje z=new Zaduzenje();
+			z.setClan(c);
+			z.setPrimerak(p);
+			z.setDatumZaduzenja(new Date()); //danasnji datum
+			
+			em.persist(z);
+			em.getTransaction().commit();
+			return z;
+			
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		
+	}
+	
+	public List<Zaduzenje> vratiZaduzenja(int clanskiBroj){
+		EntityManager em=JPAUtil.getEntityManager();
+		
+		try {
+			List<Zaduzenje> zaduzenja=em.createQuery("select z from Zaduzenje z where z.clan.clanskibroj=:clanskiBr").setParameter("clanskiBr", clanskiBroj).getResultList();
+			return zaduzenja;
+		}catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public boolean razduzi(int id) {
+		
+		try {
+			EntityManager em=JPAUtil.getEntityManager();
+			em.getTransaction().begin();
+			
+			//pronalazim zaduzenje
+			Zaduzenje z=em.find(Zaduzenje.class, id);
+			z.setDatumVracanja(new Date());
+			em.merge(z);
+			
+			em.getTransaction().commit();
+			return true;
+			
+			
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 }
